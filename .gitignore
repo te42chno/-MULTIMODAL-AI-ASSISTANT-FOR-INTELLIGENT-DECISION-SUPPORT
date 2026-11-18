@@ -1,0 +1,24 @@
+# Secrets and local environment files
+.env
+.env.*
+!.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+
+# Local application data
+backend/data/assistant.db
+backend/data/uploads/
+backend/data/vector_store/
+data/sample_data/clinical/frames_*
+
+# Editors / OS
+.idea/
+.DS_Store
+Thumbs.db

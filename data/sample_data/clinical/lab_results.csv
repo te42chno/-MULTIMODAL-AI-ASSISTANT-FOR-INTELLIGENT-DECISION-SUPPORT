@@ -1,0 +1,9 @@
+Patient_ID,Visit,Hemoglobin_g_dL,TSH_mIU_L,HeartRate_bpm
+DEMO-001,Baseline,13.9,2.1,88
+DEMO-001,Week_2,13.4,2.6,92
+DEMO-001,Week_4,12.6,3.4,98
+DEMO-001,Week_6,11.7,4.8,104
+DEMO-001,Week_8,10.8,6.4,108
+DEMO-001,Week_10,12.2,4.1,100
+DEMO-001,Week_12,13.6,2.9,94
+DEMO-001,Followup,14.8,1.8,90

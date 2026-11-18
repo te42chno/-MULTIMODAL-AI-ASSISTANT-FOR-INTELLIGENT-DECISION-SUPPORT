@@ -1,0 +1,193 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-primary: #070b14;
+    --bg-surface: #0f172a;
+    --bg-surface-elevated: #162033;
+    --border-subtle: #1e293b;
+    --border-active: #3b82f6;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-violet: #8b5cf6;
+    --accent-blue: #3b82f6;
+  }
+
+  body {
+    background-color: #070b14;
+    color: #f8fafc;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Glassmorphism utilities */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: rgba(22, 32, 51, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.glass-card:hover {
+  border-color: rgba(139, 92, 246, 0.35);
+  box-shadow: 0 4px 20px -2px rgba(139, 92, 246, 0.12);
+}
+
+/* Glow effects */
+.glow-accent {
+  box-shadow: 0 0 25px -5px rgba(139, 92, 246, 0.4);
+}
+
+.glow-blue {
+  box-shadow: 0 0 25px -5px rgba(59, 130, 246, 0.35);
+}
+
+/* Markdown prose enhancements */
+.prose-dark {
+  color: #e2e8f0;
+}
+
+.prose-dark p {
+  margin-bottom: 0.75rem;
+  line-height: 1.625;
+}
+
+.prose-dark strong {
+  color: #f8fafc;
+  font-weight: 600;
+}
+
+.prose-dark code {
+  background-color: #1e293b;
+  color: #a78bfa;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-family: monospace;
+}
+
+.prose-dark pre {
+  background-color: #0b1120;
+  border: 1px solid #1e293b;
+  padding: 0.85rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 0.75rem 0;
+}
+
+.prose-dark ul {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose-dark ol {
+  list-style-type: decimal;
+  padding-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose-dark h1, .prose-dark h2, .prose-dark h3, .prose-dark h4 {
+  color: #f8fafc;
+  font-weight: 700;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose-dark blockquote {
+  border-left: 3px solid #14b8a6;
+  padding-left: 0.85rem;
+  color: #94a3b8;
+  font-style: italic;
+  margin: 0.75rem 0;
+}
+
+/* --------------------------------------------------------------------------
+   MedReason design system — inspired by Linear, Vercel and Apple Health.
+   -------------------------------------------------------------------------- */
+.app-shell {
+  background:
+    radial-gradient(900px 500px at 12% -10%, rgba(124, 58, 237, 0.13), transparent 60%),
+    radial-gradient(700px 420px at 100% 0%, rgba(20, 184, 166, 0.10), transparent 55%),
+    #070b14;
+}
+
+.hero-orb {
+  background: radial-gradient(circle at 35% 30%, rgba(167, 139, 250, 0.9), rgba(124, 58, 237, 0.35) 45%, rgba(20, 184, 166, 0.12) 70%, transparent 72%);
+  filter: blur(2px);
+  box-shadow: 0 0 80px rgba(124, 58, 237, 0.35), inset 0 0 30px rgba(255, 255, 255, 0.12);
+}
+
+.card-lift {
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+.card-lift:hover {
+  transform: translateY(-2px);
+  border-color: rgba(45, 212, 191, 0.45);
+  box-shadow: 0 12px 36px -16px rgba(20, 184, 166, 0.35);
+}
+
+.status-dot {
+  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.12);
+}
+
+.citation-mark {
+  color: #2dd4bf;
+  font-weight: 600;
+}
+
+.fade-in {
+  animation: fade-in 260ms ease both;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, rgba(148,163,184,0.05), rgba(148,163,184,0.14), rgba(148,163,184,0.05));
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+.medical-grid {
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+}

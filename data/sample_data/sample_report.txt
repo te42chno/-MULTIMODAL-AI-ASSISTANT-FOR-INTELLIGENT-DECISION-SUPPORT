@@ -1,0 +1,37 @@
+CLINICAL PROGRESS NOTE — SYNTHETIC DEMONSTRATION RECORD
+
+Patient: DEMO-001
+Date: 2026-11-14
+Encounter: Follow-up, internal medicine
+
+Chief complaint:
+Persistent fatigue and intermittent palpitations for three weeks.
+
+History:
+Patient reports reduced exercise tolerance. No chest pain at rest. No syncope.
+Denies fever, weight loss, or nocturnal dyspnea.
+
+Examination:
+Blood pressure 118/76 mmHg. Heart rate 96 bpm, regular.
+Lungs clear to auscultation. No peripheral edema.
+
+Investigations under review:
+Complete blood count shows hemoglobin ranging from 10.8 to 14.8 g/dL across visits.
+Thyroid panel shows TSH from 1.8 to 6.4 mIU/L. The highest recorded heart rate is 108 bpm.
+
+Supporting media in this case:
+- vitals_chart.png: synthetic heart-rate and hemoglobin trend chart.
+- consultation_audio.wav: synthetic consultation recording placeholder.
+- procedure_clip.mp4: synthetic timeline demonstration clip.
+
+Assessment:
+Symptoms are non-specific. Anemia or thyroid dysfunction should be considered.
+Continue to review serial laboratory results before changing management.
+
+Plan:
+1. Review complete blood count and thyroid panel.
+2. Repeat heart rate monitoring after two weeks.
+3. Escalate to specialist review if palpitations persist or worsen.
+
+SYNTHETIC DEMONSTRATION DATA — NOT REAL PATIENT INFORMATION
+Academic demonstration only — not for clinical use.
