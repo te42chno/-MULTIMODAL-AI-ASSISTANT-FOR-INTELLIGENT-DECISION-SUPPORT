@@ -1,11 +1,18 @@
 import os
-import cv2
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any
+
 from app.config import settings
 from app.services.storage_service import storage_service
 
 logger = logging.getLogger(__name__)
+
+# OpenCV is ~112 MB installed and is intentionally excluded from the Vercel
+# function bundle. Local development still uses the exact original code path.
+try:
+    import cv2
+except ImportError:  # Vercel serverless runtime
+    cv2 = None
 
 
 class VideoService:
@@ -18,11 +25,40 @@ class VideoService:
             else frame_interval_seconds
         )
 
+    @staticmethod
+    def _serverless_fallback(filename: str) -> Dict[str, Any]:
+        """Honest metadata-only result when OpenCV is not bundled in the runtime."""
+        return {
+            "filename": filename,
+            "duration_seconds": 0.0,
+            "fps": 0.0,
+            "resolution": "unknown",
+            "frame_count": 0,
+            "extracted_frames": [],
+            "overall_summary": (
+                f"Video '{filename}' was received and stored, but interval frame extraction "
+                "is unavailable in this serverless environment (OpenCV is not bundled). "
+                "No visual timeline evidence was produced."
+            ),
+            "timeline_events": [
+                {
+                    "time": "00:00",
+                    "seconds": 0.0,
+                    "event": "Video received; frame extraction unavailable in serverless environment.",
+                }
+            ],
+            "status": "partial",
+        }
+
     def process_video(self, video_path: str, filename: str) -> Dict[str, Any]:
         """Extract key frames at intervals and compute timeline metadata."""
         video_path = storage_service.resolve(video_path)
         if not os.path.exists(video_path):
             raise FileNotFoundError(f"Video file not found: {video_path}")
+
+        if cv2 is None:
+            logger.warning("OpenCV unavailable; returning metadata-only video result.")
+            return self._serverless_fallback(filename)
 
         cap = cv2.VideoCapture(video_path)
         if not cap.isOpened():

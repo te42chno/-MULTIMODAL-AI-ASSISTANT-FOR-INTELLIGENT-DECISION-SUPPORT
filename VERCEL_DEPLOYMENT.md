@@ -22,6 +22,16 @@ The relevant files are:
 - `api/index.py` — Mangum ASGI adapter (Vercel function entrypoint)
 - `requirements.txt` — Python dependencies for the Vercel function
 - `backend/app/services/storage_service.py` — local/database storage abstraction
+- `.vercelignore` — keeps `node_modules`, local data and docs out of the upload
+
+### Function size (kept under Vercel's 500 MB limit)
+
+The root `requirements.txt` deliberately installs only lightweight packages (about 97 MB installed). Heavy ML wheels — NumPy, pandas, scikit-learn, SciPy, OpenCV and SpeechRecognition — are **not bundled**. Each affected service detects whether those libraries are present:
+
+- **Locally** (full `backend/requirements.txt` installed): the original scikit-learn embeddings, pandas analytics, OpenCV vision/frame extraction and SpeechRecognition run exactly as before — no change in answers or behaviour.
+- **On Vercel**: dependency-free fallbacks activate automatically (hashing embeddings, CSV/Excel analytics with `statistics`, Pillow colour palette, metadata-only video/speech results).
+
+If Vercel reports a bundle-size error again, confirm the root `requirements.txt` has not been expanded and that `.vercelignore` is present.
 
 ---
 

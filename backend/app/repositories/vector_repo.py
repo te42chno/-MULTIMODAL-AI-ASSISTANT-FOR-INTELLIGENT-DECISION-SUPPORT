@@ -5,8 +5,12 @@ import re
 from collections import Counter
 from typing import Any, Dict, List, Optional
 
-import numpy as np
 from sqlalchemy.orm import Session
+
+try:
+    import numpy as np
+except ImportError:  # Vercel serverless runtime
+    np = None
 
 from app.models.db_models import DocumentChunk, EvidenceChunk, FileRecord
 from app.schemas.chat import Citation
@@ -24,7 +28,9 @@ def _tokens(text: str) -> List[str]:
 def _cosine(a: List[float], b: List[float]) -> float:
     if len(a) != len(b):
         return 0.0
-    return float(np.dot(np.asarray(a, dtype="float32"), np.asarray(b, dtype="float32")))
+    if np is not None:
+        return float(np.dot(np.asarray(a, dtype="float32"), np.asarray(b, dtype="float32")))
+    return sum(x * y for x, y in zip(a, b))
 
 
 class VectorRepository:
@@ -181,7 +187,7 @@ class VectorRepository:
             return results
 
         # Legacy fallback for records indexed before the evidence table existed.
-        query_vec = np.array(embedding_service.embed_query(query))
+        query_vec = embedding_service.embed_query(query)
         q_tokens = set(_tokens(query))
         scored = []
         rows = (
@@ -192,8 +198,8 @@ class VectorRepository:
         for chunk, file_rec in rows:
             if not chunk.embedding_json:
                 continue
-            vec = np.array(json.loads(chunk.embedding_json))
-            dense = float(np.dot(query_vec, vec)) if len(vec) == len(query_vec) else 0.0
+            vec = json.loads(chunk.embedding_json)
+            dense = _cosine(query_vec, vec)
             chunk_tokens = set(_tokens(chunk.text))
             lexical = len(q_tokens & chunk_tokens) / max(len(q_tokens), 1)
             score = 0.75 * max(dense, 0.0) + 0.25 * lexical

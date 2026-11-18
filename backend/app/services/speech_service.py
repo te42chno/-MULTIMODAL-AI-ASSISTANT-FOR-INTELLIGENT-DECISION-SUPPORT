@@ -3,19 +3,24 @@ import wave
 import logging
 from typing import Any, Dict, List, Optional
 
-import speech_recognition as sr
-
 from app.config import settings
 from app.services.storage_service import storage_service
 
 logger = logging.getLogger(__name__)
+
+# SpeechRecognition is ~43 MB installed and is excluded from the Vercel bundle.
+# Local development keeps the original recogniser path unchanged.
+try:
+    import speech_recognition as sr
+except ImportError:  # Vercel serverless runtime
+    sr = None
 
 
 class SpeechService:
     """Local-first ASR with optional Whisper and offline SpeechRecognition fallback."""
 
     def __init__(self):
-        self.recognizer = sr.Recognizer()
+        self.recognizer = sr.Recognizer() if sr is not None else None
         self.provider = settings.SPEECH_PROVIDER.lower()
 
     def transcribe_audio(self, audio_path: str) -> Dict[str, Any]:
@@ -95,10 +100,14 @@ class SpeechService:
                 )
             return parts, " ".join(p["text"] for p in parts)
         except Exception as exc:
-            logger.warning("Whisper unavailable (%s); using SpeechRecognition fallback.", exc)
+            logger.warning("Whisper unavailable (%s); using local fallback.", exc)
             return [], ""
 
     def _transcribe_local(self, path: str, duration: float):
+        if sr is None or self.recognizer is None:
+            logger.warning("SpeechRecognition unavailable; returning metadata-only transcript.")
+            return "[Transcription unavailable — audio was received successfully.]", []
+
         try:
             with sr.AudioFile(path) as source:
                 audio = self.recognizer.record(source)

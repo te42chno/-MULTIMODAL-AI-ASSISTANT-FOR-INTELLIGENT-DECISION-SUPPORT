@@ -1,0 +1,14 @@
+# Keep the Vercel upload and function bundle small.
+.git
+frontend/node_modules
+backend/data
+backend/.pytest_cache
+data/sample_data
+**/__pycache__
+*.pyc
+*.pyo
+.env
+backend/.env
+presentation_assets_ui.jpeg
+PRESENTATION.html
+MedReason_Presentation.pdf
