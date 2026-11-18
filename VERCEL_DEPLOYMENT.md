@@ -68,6 +68,10 @@ The SQLite file cannot survive serverless invocations, so you need a hosted Post
 
    Replace `postgres://` / `postgresql://` with `postgresql+pg8000://` and keep `sslmode=require`.
 
+> **Keep `?sslmode=require` in the string.** The app now translates it into pg8000's `ssl_context` automatically, so older `TypeError: connect() got an unexpected keyword argument 'sslmode'` errors are resolved.
+>
+> **Use the real Neon string — not a placeholder.** Values such as `USER:PASSWORD@EP-HOST` are examples only. If the host is literally `EP-HOST`, the app cannot resolve it and every request will fail with `getaddrinfo failed` / `Can't create a connection to host EP-HOST`. Copy the actual connection string from your Neon dashboard.
+
 > Tables are created automatically on the first request via `Base.metadata.create_all()`. No manual migration is needed.
 
 ---
