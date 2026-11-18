@@ -13,17 +13,23 @@ UPLOAD_DIR = DATA_DIR / "uploads"
 VECTOR_DIR = DATA_DIR / "vector_store"
 DB_PATH = DATA_DIR / "assistant.db"
 
-for p in [
-    DATA_DIR,
-    UPLOAD_DIR,
-    UPLOAD_DIR / "documents",
-    UPLOAD_DIR / "images",
-    UPLOAD_DIR / "audio",
-    UPLOAD_DIR / "videos",
-    UPLOAD_DIR / "datasets",
-    VECTOR_DIR,
-]:
-    p.mkdir(parents=True, exist_ok=True)
+# Serverless filesystems are read-only outside /tmp, and database-backed storage
+# does not need local directories at all. Never fail application import over this.
+if os.getenv("STORAGE_BACKEND", "local").lower() != "database":
+    for p in [
+        DATA_DIR,
+        UPLOAD_DIR,
+        UPLOAD_DIR / "documents",
+        UPLOAD_DIR / "images",
+        UPLOAD_DIR / "audio",
+        UPLOAD_DIR / "videos",
+        UPLOAD_DIR / "datasets",
+        VECTOR_DIR,
+    ]:
+        try:
+            p.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            pass
 
 
 def _env_int(name: str, default: int) -> int:
@@ -81,7 +87,18 @@ class Settings(BaseModel):
         default_factory=lambda: _env_int("VIDEO_FRAME_INTERVAL_SECONDS", 2)
     )
 
-    DATABASE_URL: str = Field(default_factory=lambda: f"sqlite:///{DB_PATH}")
+    # Serverless deployments (e.g. Vercel) must supply an external Postgres URL;
+    # the default SQLite file is for local development only.
+    DATABASE_URL: str = Field(
+        default_factory=lambda: os.getenv("DATABASE_URL") or f"sqlite:///{DB_PATH}"
+    )
+
+    # local      -> keep uploads on the local filesystem (development)
+    # database   -> persist upload bytes in the DB and stage them in /tmp (serverless)
+    STORAGE_BACKEND: str = Field(
+        default_factory=lambda: os.getenv("STORAGE_BACKEND", "local").lower()
+    )
+    TEMP_DIR: str = Field(default_factory=lambda: os.getenv("TEMP_DIR", "/tmp/medreason"))
 
     CORS_ORIGINS: List[str] = Field(
         default_factory=lambda: _env_list(

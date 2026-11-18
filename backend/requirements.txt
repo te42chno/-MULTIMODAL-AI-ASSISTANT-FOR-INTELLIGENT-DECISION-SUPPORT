@@ -18,7 +18,9 @@ Pillow>=10.2.0
 SpeechRecognition>=3.10.0
 pydub>=0.25.1
 pytesseract>=0.3.10
-sentence-transformers>=2.5.0
+# Optional (large, ~800MB with PyTorch). Install manually only when using
+# EMBEDDING_PROVIDER=local_transformers:
+# sentence-transformers>=2.5.0
 # Optional local Whisper ASR (free/offline). Install for SPEECH_PROVIDER=whisper.
 # faster-whisper>=1.0.0
 pytest>=8.0.0

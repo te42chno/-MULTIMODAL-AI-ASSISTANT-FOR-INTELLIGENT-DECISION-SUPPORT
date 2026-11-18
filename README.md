@@ -182,21 +182,25 @@ MedReason/
 │  │  ├─ models/db_models.py   # FileRecord, EvidenceChunk, conversations, messages
 │  │  ├─ repositories/         # hybrid vector search, files, conversations
 │  │  ├─ schemas/              # Pydantic request/response models
-│  │  ├─ services/             # LLM, VLM, speech, video, analytics, decision, orchestrator
-│  │  ├─ config.py             # environment-driven settings
-│  │  └─ main.py               # FastAPI app, CORS, health, static media
-│  ├─ data/assistant.db        # SQLite database (created at startup)
-│  ├─ data/uploads/            # Uploaded files and extracted frames
-│  ├─ tests/test_system.py     # 9 end-to-end API tests
-│  └─ .env                     # Local secrets — never committed
+│  │  ├─ services/             # LLM, VLM, speech, video, analytics, storage, decision, orchestrator
+│  ├─ config.py               # environment-driven settings
+│  ├─ main.py                 # FastAPI app, CORS, health, static media
+│  ├─ data/assistant.db       # SQLite database (created at startup)
+│  ├─ data/uploads/           # Uploaded files and extracted frames
+│  ├─ tests/test_system.py    # 9 end-to-end API tests
+│  └─ .env                    # Local secrets — never committed
 ├─ frontend/
-│  ├─ src/components/          # Sidebar, chat, composer, report, drawers, modals
-│  ├─ src/services/api.ts      # Axios client (defaults to :8000)
-│  └─ .env.example             # Optional VITE_API_URL override
-├─ data/sample_data/clinical/  # Synthetic clinical fixtures
-├─ .env.example                # Backend configuration template
-├─ README.md                   # This file
-└─ USER_AND_TEST_GUIDE.md      # Step-by-step usage and manual testing guide
+│  ├─ src/components/         # Sidebar, chat, composer, report, drawers, modals
+│  ├─ src/services/api.ts     # Axios client (:8000 locally, /api on Vercel)
+│  └─ .env.example            # Optional VITE_API_URL override
+├─ api/index.py               # Vercel serverless entrypoint (Mangum)
+├─ data/sample_data/clinical/ # Synthetic clinical fixtures
+├─ vercel.json                # Vercel build, rewrite and function settings
+├─ requirements.txt           # Vercel Python function dependencies
+├─ .env.example               # Backend configuration template
+├─ README.md                  # This file
+├─ USER_AND_TEST_GUIDE.md     # Step-by-step usage and manual testing guide
+└─ VERCEL_DEPLOYMENT.md       # Full Vercel deployment guide
 ```
 
 ---
@@ -405,14 +409,30 @@ npm run build
 4. Offline decision reports are evidence inventories; structured recommendations require a configured LLM.
 5. Video understanding samples frames at intervals; it does not model continuous temporal events.
 6. Tesseract and Whisper are optional and their fallbacks are lower fidelity.
-7. SQLite and local file storage suit demonstration, not multi-user deployment.
-8. Do not upload real patient data.
+7. SQLite and local file storage suit demonstration, not multi-user deployment (Vercel uses hosted Postgres).
+8. On Vercel Hobby (~10s function limit), live Groq/Gemini calls time out; use the offline providers or upgrade to Pro.
+9. Do not upload real patient data.
+
+---
+
+## Deploying to Vercel
+
+The full app can be deployed to Vercel: the React UI as a static site and the FastAPI backend as a Python serverless function on the same domain at `/api`.
+
+- Hosted Postgres (e.g. Neon free tier) replaces the local SQLite file.
+- Upload bytes are stored in Postgres and staged in `/tmp` for each request, so the default file-based architecture keeps working.
+- The frontend automatically uses the same-origin `/api` URL in production.
+
+**Hobby tier:** run with `LLM_PROVIDER=mock` and `VISION_PROVIDER=mock` for a fully working offline demo. **Pro tier:** enable Groq/Gemini and raise `maxDuration` to 60 in `vercel.json`.
+
+See [`VERCEL_DEPLOYMENT.md`](VERCEL_DEPLOYMENT.md) for the complete step-by-step guide.
 
 ---
 
 ## Documentation
 
 - [`USER_AND_TEST_GUIDE.md`](USER_AND_TEST_GUIDE.md) — usage tutorial, prompts, manual test matrix and troubleshooting.
+- [`VERCEL_DEPLOYMENT.md`](VERCEL_DEPLOYMENT.md) — full Vercel setup, environment variables and limitations.
 - [`backend/tests/test_system.py`](backend/tests/test_system.py) — automated integration tests.
 - FastAPI Swagger UI — <http://127.0.0.1:8000/docs> when the backend is running.
 

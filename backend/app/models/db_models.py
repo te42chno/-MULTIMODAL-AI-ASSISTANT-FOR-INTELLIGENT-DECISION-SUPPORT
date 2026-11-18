@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, Text, Integer, Float, DateTime, ForeignKey, Boolean
+from sqlalchemy import Column, String, Text, Integer, Float, DateTime, ForeignKey, Boolean, LargeBinary
 from sqlalchemy.orm import backref, relationship
 from app.database import Base
 
@@ -84,6 +84,18 @@ class EvidenceChunk(Base):
         "FileRecord",
         backref=backref("evidence_chunks", cascade="all, delete-orphan"),
     )
+
+
+class StoredBlob(Base):
+    """Upload bytes persisted in the database for ephemeral serverless filesystems."""
+
+    __tablename__ = "stored_blobs"
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    filename = Column(String(255), nullable=False)
+    content_type = Column(String(100), nullable=True)
+    data = Column(LargeBinary, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 
 class DecisionReport(Base):

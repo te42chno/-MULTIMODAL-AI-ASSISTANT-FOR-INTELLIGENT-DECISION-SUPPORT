@@ -3,6 +3,7 @@ import cv2
 import logging
 from typing import Dict, Any, List, Optional
 from app.config import settings
+from app.services.storage_service import storage_service
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,7 @@ class VideoService:
 
     def process_video(self, video_path: str, filename: str) -> Dict[str, Any]:
         """Extract key frames at intervals and compute timeline metadata."""
+        video_path = storage_service.resolve(video_path)
         if not os.path.exists(video_path):
             raise FileNotFoundError(f"Video file not found: {video_path}")
 

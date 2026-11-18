@@ -5,6 +5,7 @@ from pypdf import PdfReader
 import docx
 from app.config import settings
 from app.schemas.document import DocumentUploadResponse, DocumentChunkResult
+from app.services.storage_service import storage_service
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,7 @@ class DocumentService:
 
     def process_document(self, file_path: str, filename: str) -> Dict[str, Any]:
         """Extract text with page-level tracking and generate chunks."""
+        file_path = storage_service.resolve(file_path)
         ext = filename.rsplit(".", 1)[-1].lower()
         pages_content = []
 

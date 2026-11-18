@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from typing import Dict, Any, List, Optional
 from app.schemas.dataset import DatasetSummaryResponse, ColumnMetadata, ChartSpec, DatasetQueryResponse
+from app.services.storage_service import storage_service
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +17,7 @@ class DataAnalysisService:
 
     def load_dataset(self, file_path: str, filename: str) -> pd.DataFrame:
         """Safely load CSV or Excel dataset with size guards."""
+        file_path = storage_service.resolve(file_path)
         ext = filename.rsplit(".", 1)[-1].lower()
         if ext == "csv":
             df = pd.read_csv(file_path, nrows=self.MAX_ROWS_PROCESS)

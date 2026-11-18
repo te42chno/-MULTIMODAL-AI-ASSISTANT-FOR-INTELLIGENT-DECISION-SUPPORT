@@ -9,6 +9,7 @@ import numpy as np
 import cv2
 import httpx
 from app.config import settings
+from app.services.storage_service import storage_service
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +24,7 @@ class VisionService:
 
     async def analyze_image(self, image_path: str, prompt: Optional[str] = None) -> Dict[str, Any]:
         """Analyze image, compute visual stats, perform OCR, and query VLM if configured."""
+        image_path = storage_service.resolve(image_path)
         try:
             with Image.open(image_path) as img:
                 width, height = img.size

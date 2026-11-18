@@ -1,11 +1,9 @@
-import os
-import shutil
-import uuid
 from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import Optional
-from app.config import settings, UPLOAD_DIR
+from app.config import settings
 from app.database import get_db
+from app.services.storage_service import storage_service
 from app.core.security import sanitize_filename, validate_file_extension, determine_modality
 from app.repositories.file_repo import FileRepository
 from app.repositories.vector_repo import VectorRepository
@@ -21,21 +19,14 @@ router = APIRouter()
 async def _save_uploaded_file(file: UploadFile, subfolder: str) -> str:
     """Save upload to isolated directory with sanitized unique filename."""
     clean_name = sanitize_filename(file.filename or "uploaded_file")
-    ext = validate_file_extension(clean_name)
-    
-    unique_name = f"{uuid.uuid4().hex[:8]}_{clean_name}"
-    dest_dir = UPLOAD_DIR / subfolder
-    dest_dir.mkdir(parents=True, exist_ok=True)
-    file_path = dest_dir / unique_name
+    validate_file_extension(clean_name)
 
     content = await file.read()
     if len(content) > settings.MAX_UPLOAD_SIZE_BYTES:
         raise HTTPException(status_code=400, detail=f"File exceeds maximum size of {settings.MAX_UPLOAD_SIZE_BYTES//(1024*1024)}MB.")
 
-    with open(file_path, "wb") as f:
-        f.write(content)
-
-    return str(file_path), clean_name, len(content)
+    path_key = storage_service.save(content, clean_name, subfolder)
+    return path_key, clean_name, len(content)
 
 
 def _index_multimodal_evidence(

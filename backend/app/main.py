@@ -36,8 +36,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files for media access (frame previews, images)
-app.mount("/static/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
+# Local development only: media previews need a persistent filesystem.
+if settings.STORAGE_BACKEND == "local" and UPLOAD_DIR.exists():
+    app.mount("/static/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
 # Include API endpoints under /api
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
@@ -54,7 +55,10 @@ def health_check():
         "vision_provider": settings.VISION_PROVIDER,
         "speech_provider": settings.SPEECH_PROVIDER,
         "embedding_provider": settings.EMBEDDING_PROVIDER,
-        "database": "SQLite (initialized)"
+        "database": "PostgreSQL (initialized)"
+        if settings.DATABASE_URL.startswith(("postgres", "postgresql"))
+        else "SQLite (initialized)",
+        "storage_backend": settings.STORAGE_BACKEND,
     }
 
 

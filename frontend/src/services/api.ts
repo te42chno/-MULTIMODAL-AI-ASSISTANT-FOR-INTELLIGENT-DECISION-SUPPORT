@@ -1,7 +1,11 @@
 import axios from 'axios';
 import { Conversation, Message, UploadedFile, DecisionReport } from '../types';
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://127.0.0.1:8000/api';
+// On Vercel the API is served from the same origin via the /api rewrite.
+// Local development still targets the standalone FastAPI server on port 8000.
+const META_ENV = (import.meta as any).env || {};
+const API_BASE_URL =
+  META_ENV.VITE_API_URL || (META_ENV.PROD ? '/api' : 'http://127.0.0.1:8000/api');
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

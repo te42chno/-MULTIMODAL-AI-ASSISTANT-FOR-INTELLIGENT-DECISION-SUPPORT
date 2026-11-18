@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional
 import speech_recognition as sr
 
 from app.config import settings
+from app.services.storage_service import storage_service
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,7 @@ class SpeechService:
         self.provider = settings.SPEECH_PROVIDER.lower()
 
     def transcribe_audio(self, audio_path: str) -> Dict[str, Any]:
+        audio_path = storage_service.resolve(audio_path)
         if not os.path.exists(audio_path):
             raise FileNotFoundError(f"Audio file not found: {audio_path}")
 
