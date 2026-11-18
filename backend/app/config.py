@@ -13,9 +13,28 @@ UPLOAD_DIR = DATA_DIR / "uploads"
 VECTOR_DIR = DATA_DIR / "vector_store"
 DB_PATH = DATA_DIR / "assistant.db"
 
+
+def _database_url() -> str:
+    """Resolve DATABASE_URL, ignoring documentation placeholders.
+
+    A copy/pasted example URL such as ``...USER:PASSWORD@EP-HOST...`` cannot be
+    connected to. Falling back to local SQLite keeps the app usable instead of
+    crashing every request at import time. Real Postgres URLs are untouched.
+    """
+    raw = os.getenv("DATABASE_URL", "").strip()
+    if not raw:
+        return f"sqlite:///{DB_PATH}"
+    lowered = raw.lower()
+    if "ep-host" in lowered or "user:password@" in lowered:
+        return f"sqlite:///{DB_PATH}"
+    return raw
+
+
+DATABASE_URL = _database_url()
+
 # Serverless filesystems are read-only outside /tmp, and database-backed storage
 # does not need local directories at all. Never fail application import over this.
-if os.getenv("STORAGE_BACKEND", "local").lower() != "database":
+if os.getenv("STORAGE_BACKEND", "local").lower() != "database" or DATABASE_URL.startswith("sqlite"):
     for p in [
         DATA_DIR,
         UPLOAD_DIR,
@@ -89,9 +108,7 @@ class Settings(BaseModel):
 
     # Serverless deployments (e.g. Vercel) must supply an external Postgres URL;
     # the default SQLite file is for local development only.
-    DATABASE_URL: str = Field(
-        default_factory=lambda: os.getenv("DATABASE_URL") or f"sqlite:///{DB_PATH}"
-    )
+    DATABASE_URL: str = Field(default_factory=lambda: DATABASE_URL)
 
     # local      -> keep uploads on the local filesystem (development)
     # database   -> persist upload bytes in the DB and stage them in /tmp (serverless)
