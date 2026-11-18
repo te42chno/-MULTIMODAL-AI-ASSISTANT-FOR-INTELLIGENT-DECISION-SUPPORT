@@ -33,6 +33,8 @@ The root `requirements.txt` deliberately installs only lightweight packages (abo
 
 If Vercel reports a bundle-size error again, confirm the root `requirements.txt` has not been expanded and that `.vercelignore` is present.
 
+> **Deployment check:** the fix is in commit `336101f`. In Vercel → Deployments, the newest deployment must show this commit hash (or a later one). If it shows `afb2b6c` or `40243fd`, you are looking at an old deployment — redeploy from `main`.
+
 ---
 
 ## Important: read this before deploying
